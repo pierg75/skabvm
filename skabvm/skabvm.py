@@ -1,11 +1,26 @@
 # -*- coding: utf-8 -*-
 import argparse
-
+import sys
+from modules import virt
 
 def main():
     """The main function of skabvm"""
     args = parse_options()
-    print("{}".format(args))
+    virt_conn = virt.libVirt(args.user, args.host)
+    con = virt_conn.connect()
+    types = virt_conn.get_machine_type(virt_conn.caps(con))
+    # The pc-q35 is the latest machine type, so if possible let's use it
+    # We also restrict for now to only x86_64 machines
+    for arch in types:
+        if 'x86_64' in arch:
+            for machine in types[arch]:
+                if 'pc-q35' in machine:
+                    usable_type = machine
+
+    print(usable_type)
+    con.close()
+    sys.exit(0)
+
 
 
 def parse_options():
@@ -21,8 +36,13 @@ def parse_options():
     parser.add_argument('--filedevice', '-f', help='The image file used as storage')
     parser.add_argument('--networks', '-n', help='The number of networking devices')
 
-    return parser.parse_args()
-    
+    args = parser.parse_args()
+    if args.user is None or args.host is None:
+        print("You need to pass both the user and the host used to connect")
+        print("to the hypervisor\n")
+        parser.print_help()
+        sys.exit(1)
+    return args
 
 if __name__ == "__main__":
     # execute only if run as a script
