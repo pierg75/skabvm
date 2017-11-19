@@ -65,4 +65,17 @@ class libVirt(object):
                 machines = []
         return d
 
+    def list_vms_by_name(self, conn):
+        """It lists all the VMs on this hypervisor.
+
+        Attributes:
+            conn: The virConnect class returned from a libvirt.open*() call
+        """
+        try:
+            vms = conn.listDefinedDomains()
+        except:
+            print("Unexpected error while retrieving list of VMs")
+            sys.exit(1)
+        return vms
+
 # vim: set et ts=4 sw=4 :
