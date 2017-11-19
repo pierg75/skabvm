@@ -8,9 +8,9 @@ from modules import virt
 def main():
     """The main function of skabvm"""
     args = parse_options()
-    virt_conn = virt.libVirt(args.user, args.host)
-    con = virt_conn.connect()
-    types = virt_conn.get_machine_type(virt_conn.caps(con))
+    virtual = virt.libVirt(args.user, args.host)
+    conn = virtual.connect()
+    types = virtual.get_machine_type(virtual.caps(conn))
     # The pc-q35 is the latest machine type, so if possible let's use it
     # We also restrict for now to only x86_64 machines
     for arch in types:
@@ -19,8 +19,15 @@ def main():
                 if 'pc-q35' in machine:
                     usable_type = machine
 
-    print(usable_type)
-    con.close()
+    # Let's check the new VM name is not already used
+    vms = virtual.list_vms_by_name(conn)
+    if args.name in vms:
+        print("The name {} is already used".format(args.name))
+        conn.close()
+        sys.exit(2)
+
+    print(vms)
+    conn.close()
     sys.exit(0)
 
 
