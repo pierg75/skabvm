@@ -1,6 +1,7 @@
-import libvirt
 import sys
 from xml.etree import ElementTree
+
+import libvirt
 
 
 class libVirt(object):
@@ -9,7 +10,6 @@ class libVirt(object):
     Attributes:
         user: The username for the connection
         host: The hostname for the connection
-        
     """
 
     def __init__(self, user, host):
@@ -30,7 +30,7 @@ class libVirt(object):
 
     def caps(self, conn):
         """It gets the capabilities of the hypervisor
-        
+
         Attributes:
             conn:   The virConnect class returned from a libvirt.open*() call
 
@@ -38,8 +38,8 @@ class libVirt(object):
         try:
             caps = conn.getCapabilities()
         except:
-			print("Unexpected error while retrieving the hypervisor capabilities")
-			sys.exit(1)
+            print("Unexpected error while retrieving hypervisor capabilities")
+            sys.exit(1)
         return caps
 
     def get_machine_type(self, caps):
@@ -48,10 +48,10 @@ class libVirt(object):
         supported and the values a list of possible machine types.
 
         Attributes:
-            caps = string representing the capabilities XML 
+            caps = string representing the capabilities XML
 
         """
-        
+
         d = {}
         machines = []
         tree = ElementTree.fromstring(caps)

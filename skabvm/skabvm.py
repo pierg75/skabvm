@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 import argparse
 import sys
+
 from modules import virt
+
 
 def main():
     """The main function of skabvm"""
@@ -22,19 +24,22 @@ def main():
     sys.exit(0)
 
 
-
 def parse_options():
     """Handles the various options passed to the command line.
-	It returns a argparse.Namespace.	
-	"""
+    It returns a argparse.Namespace.
+    """
 
-    parser = argparse.ArgumentParser(description='Provision a new Virtual Machine')
+    parser = argparse.ArgumentParser(
+                description='Provision a new Virtual Machine')
     parser.add_argument('name', help='The name of the new virtual machine')
     parser.add_argument('--user', help='Username for the connection')
     parser.add_argument('--host', help='Hostname')
-    parser.add_argument('--blockdevice', '-b', help='The block device used as storage')
-    parser.add_argument('--filedevice', '-f', help='The image file used as storage')
-    parser.add_argument('--networks', '-n', help='The number of networking devices')
+    parser.add_argument('--blockdevice', '-b',
+                        help='The block device used as storage')
+    parser.add_argument('--filedevice', '-f',
+                        help='The image file used as storage')
+    parser.add_argument('--networks', '-n',
+                        help='The number of networking devices')
 
     args = parser.parse_args()
     if args.user is None or args.host is None:
@@ -43,6 +48,7 @@ def parse_options():
         parser.print_help()
         sys.exit(1)
     return args
+
 
 if __name__ == "__main__":
     # execute only if run as a script
