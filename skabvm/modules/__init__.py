@@ -1,1 +1,1 @@
-__all__ = ["libvirt"]
+__all__ = ["libvirt", "dm"]
