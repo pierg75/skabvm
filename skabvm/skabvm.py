@@ -47,6 +47,9 @@ def parse_options():
                         help='The image file used as storage')
     parser.add_argument('--networks', '-n',
                         help='The number of networking devices')
+    parser.add_argument('--vmtype', '-t',
+                        help='Type of the VM',
+                        choices=['pc-q35', 'pc-i440fx'])
 
     args = parser.parse_args()
     if args.user is None or args.host is None:
