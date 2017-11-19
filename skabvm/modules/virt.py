@@ -78,4 +78,21 @@ class libVirt(object):
             sys.exit(1)
         return vms
 
+    def create_vm(self, conn, template):
+        """It creates a new VM based on a template.
+
+        Attributes:
+            conn: The virConnect class returned from a libvirt.open*() call
+            template: The path to the type of the template
+        """
+        xml = ""
+        with open(template, "r") as file:
+            xml = file.read()
+        try:
+            vm = conn.defineXML(xml)
+        except:
+            print("Unexpected error while creating list of VMs")
+            sys.exit(1)
+        return vm
+
 # vim: set et ts=4 sw=4 :
