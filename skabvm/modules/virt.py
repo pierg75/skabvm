@@ -78,21 +78,20 @@ class libVirt(object):
             sys.exit(1)
         return vms
 
-    def create_vm(self, conn, template):
+    def create_vm(self, name, conn, template):
         """It creates a new VM based on a template.
 
         Attributes:
+            name: The name of the VM
             conn: The virConnect class returned from a libvirt.open*() call
             template: The path to the type of the template
         """
         xml = ""
-        with open(template, "r") as file:
-            xml = file.read()
-        try:
-            vm = conn.defineXML(xml)
-        except:
-            print("Unexpected error while creating list of VMs")
-            sys.exit(1)
+        tree = ElementTree.parse(template)
+        root = tree.getroot()
+        tree.find('.//name').text = name
+        xml = ElementTree.tostring(root, encoding='utf8', method='xml')
+        vm = conn.defineXML(xml)
         return vm
 
 # vim: set et ts=4 sw=4 :

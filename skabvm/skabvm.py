@@ -69,7 +69,8 @@ def main():
         sys.exit(2)
 
     # Create the vm based on the template
-    newvm = virtual.create_vm(conn,
+    newvm = virtual.create_vm(args.name,
+                              conn,
                               os.path.join(definitions.TEMPLATE_PATH,
                               ("{}.{}".format(args.vmtype, "xml"))))
 
