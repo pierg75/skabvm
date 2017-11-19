@@ -1,34 +1,9 @@
 # -*- coding: utf-8 -*-
 import argparse
 import sys
+import definitions
 
 from modules import virt
-
-
-def main():
-    """The main function of skabvm"""
-    args = parse_options()
-    virtual = virt.libVirt(args.user, args.host)
-    conn = virtual.connect()
-    types = virtual.get_machine_type(virtual.caps(conn))
-    # The pc-q35 is the latest machine type, so if possible let's use it
-    # We also restrict for now to only x86_64 machines
-    for arch in types:
-        if 'x86_64' in arch:
-            for machine in types[arch]:
-                if 'pc-q35' in machine:
-                    usable_type = machine
-
-    # Let's check the new VM name is not already used
-    vms = virtual.list_vms_by_name(conn)
-    if args.name in vms:
-        print("The name {} is already used".format(args.name))
-        conn.close()
-        sys.exit(2)
-
-    print(vms)
-    conn.close()
-    sys.exit(0)
 
 
 def parse_options():
@@ -58,6 +33,32 @@ def parse_options():
         parser.print_help()
         sys.exit(1)
     return args
+
+
+def main():
+    """The main function of skabvm"""
+    args = parse_options()
+    virtual = virt.libVirt(args.user, args.host)
+    conn = virtual.connect()
+    types = virtual.get_machine_type(virtual.caps(conn))
+    # The pc-q35 is the latest machine type, so if possible let's use it
+    # We also restrict for now to only x86_64 machines
+    for arch in types:
+        if 'x86_64' in arch:
+            for machine in types[arch]:
+                if 'pc-q35' in machine:
+                    usable_type = machine
+
+    # Let's check the new VM name is not already used
+    vms = virtual.list_vms_by_name(conn)
+    if args.name in vms:
+        print("The name {} is already used".format(args.name))
+        conn.close()
+        sys.exit(2)
+
+    print(vms)
+    conn.close()
+    sys.exit(0)
 
 
 if __name__ == "__main__":
