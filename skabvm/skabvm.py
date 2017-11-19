@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 import argparse
+import os
 import sys
+
 import definitions
 
 from modules import virt
@@ -41,13 +43,23 @@ def main():
     virtual = virt.libVirt(args.user, args.host)
     conn = virtual.connect()
     types = virtual.get_machine_type(virtual.caps(conn))
-    # The pc-q35 is the latest machine type, so if possible let's use it
+
     # We also restrict for now to only x86_64 machines
+    usable_type = []
     for arch in types:
         if 'x86_64' in arch:
             for machine in types[arch]:
-                if 'pc-q35' in machine:
-                    usable_type = machine
+                usable_type.append(machine)
+
+    match_type = False
+    for t in usable_type:
+        if args.vmtype in t:
+            match_type = True
+
+    if not match_type:
+        print(("The hypervisor do not seem to support this type ({})"
+               " of machine").format(args.vmtype))
+        sys.exit(1)
 
     # Let's check the new VM name is not already used
     vms = virtual.list_vms_by_name(conn)
@@ -56,7 +68,12 @@ def main():
         conn.close()
         sys.exit(2)
 
-    print(vms)
+    # Create the vm based on the template
+    newvm = virtual.create_vm(conn,
+                              os.path.join(definitions.TEMPLATE_PATH,
+                              ("{}.{}".format(args.vmtype, "xml"))))
+
+    print(newvm)
     conn.close()
     sys.exit(0)
 
