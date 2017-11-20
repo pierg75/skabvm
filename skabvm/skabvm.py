@@ -5,7 +5,7 @@ import sys
 
 import definitions
 
-from modules import virt
+from modules import dm, virt
 
 
 def parse_options():
@@ -72,6 +72,8 @@ def main():
         conn.close()
         sys.exit(2)
 
+    # Let's instantiate a device mapper object
+    devmap = dm.dmDev()
     # Create the vm based on the template
     newvm = virtual.create_vm(args.name,
                               conn,
@@ -79,6 +81,7 @@ def main():
                               ("{}.{}".format(args.vmtype, "xml"))))
 
     print(newvm)
+
     conn.close()
     sys.exit(0)
 
