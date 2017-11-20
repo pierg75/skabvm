@@ -27,6 +27,10 @@ def parse_options():
     parser.add_argument('--vmtype', '-t',
                         help='Type of the VM',
                         choices=['pc-q35', 'pc-i440fx'])
+    parser.add_argument('--pool', '-p',
+                        help='Thin pool to use to create the VM disk')
+    parser.add_argument('--size', '-s',
+                        help='Size of the thin LV', default='10GB')
 
     args = parser.parse_args()
     if args.user is None or args.host is None:
