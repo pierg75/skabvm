@@ -1,4 +1,5 @@
 import sys
+from subprocess import Popen, PIPE
 
 import dmpy as dm
 
@@ -28,15 +29,27 @@ class dmDev(object):
         dmt.run()
         return dmt.get_versions()
 
-    def create_thinlv(self, name, size, pool):
-        """This should basically do what the function _create() in 
-        tools/dmsetup.c does. I guess we can probably better do a 
+    def create_thinlv(self, name, size, thinpool, vg):
+        """This should basically do what the function _create() in
+        tools/dmsetup.c does. I guess we can probably better do a
         generic create() and then a special case for thinlv.
         Note: This doesn't yet work
 
+        For now it just uses lvcreate to have a quick working solution.
+        """
         """
         dmt_thin = dm.DmTask(dm.DM_DEVICE_CREATE)
         dmt_thin.set_name(name)
         dmt_thin.
         dmt_thin.set_message('0 390625 thin /dev/mapper/testvg-pool0 20')
         dmt_thin.run()
+        """
+        lvm_comm = ["lvcreate", "-n", "-V", "--thinpool"]
+        lvm_comm.insert(2, name)
+        lvm_comm.insert(4, size)
+        lvm_comm.append(thinpool)
+        lvm_comm.append(vg)
+        p = Popen(lvm_comm, stdout=PIPE)
+        out, err = p.communicate()
+        errno = p.poll()
+        return (errno, out, err)

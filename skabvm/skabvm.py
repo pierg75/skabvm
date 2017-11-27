@@ -29,6 +29,8 @@ def parse_options():
                         choices=['pc-q35', 'pc-i440fx'])
     parser.add_argument('--pool', '-p',
                         help='Thin pool to use to create the VM disk')
+    parser.add_argument('--volumegroup', '-vg',
+                        help='Thin pool Volume Group')
     parser.add_argument('--size', '-s',
                         help='Size of the thin LV', default='10GB')
 
@@ -73,7 +75,15 @@ def main():
         sys.exit(2)
 
     # Let's instantiate a device mapper object
-    devmap = dm.dmDev()
+    devm = dm.dmDev()
+    # Create a thinlv
+    errno, out, err = devm.create_thinlv(args.name, args.size,
+                                         args.pool, args.volumegroup)
+    if errno:
+        print("An error occurred while creating the ThinLV:")
+        print("\tStandard output: %" % out)
+        print("\tStandard error: %" % out)
+
     # Create the vm based on the template
     newvm = virtual.create_vm(args.name,
                               conn,
