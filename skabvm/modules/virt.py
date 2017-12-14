@@ -94,4 +94,29 @@ class libVirt(object):
         vm = conn.defineXML(xml)
         return vm
 
+    def attach_disk_vm(self, vm, conn, template, typ, device):
+        """Attach to the vm a new disk based on a XML template.
+
+        Attributes:
+            vm: the virDomain class object
+            conn: the virConnect class object
+            template: the template file used for the disk
+            type: type of disk to use (virtio, ide, scsi...)
+            device: the path to the device (/dev/mapper/vg/lv)
+        """
+        tree = ElementTree.parse(template)
+        root = tree.getroot()
+        tree.find('./target').attrib['bus'] = typ
+        if typ == 'scsi':
+            tree.find('./target').attrib['dev'] = 'sda'
+        if typ == 'virtio':
+            tree.find('./target').attrib['dev'] = 'vda'
+        if typ == 'ide':
+            tree.find('./target').attrib['dev'] = 'hda'
+        tree.find('./source').attrib['file'] = device
+        xml = ElementTree.tostring(root, encoding='utf8', method='xml')
+        vm = conn.define
+            
+        pass
+
 # vim: set et ts=4 sw=4 :
