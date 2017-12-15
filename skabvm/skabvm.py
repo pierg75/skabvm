@@ -15,24 +15,28 @@ def parse_options():
 
     parser = argparse.ArgumentParser(
                 description='Provision a new Virtual Machine')
+    subparsers = parser.add_subparsers(help='sub-command help')
     parser.add_argument('name', help='The name of the new virtual machine')
     parser.add_argument('--user', help='Username for the connection')
     parser.add_argument('--host', help='Hostname')
-    parser.add_argument('--blockdevice', '-b',
+    parser_create = subparsers.add_parser('create', help='Create a new VM')
+    parser_create_group_block = parser_create.add_mutually_exclusive_group()
+    parser_create_group_block.add_argument('--blockdevice', '-b',
                         help='The block device used as storage')
-    parser.add_argument('--filedevice', '-f',
+    parser_create_group_block.add_argument('--filedevice', '-f',
                         help='The image file used as storage')
-    parser.add_argument('--networks', '-n',
+    parser_create.add_argument('--networks', '-n',
                         help='The number of networking devices')
-    parser.add_argument('--vmtype', '-t',
+    parser_create.add_argument('--vmtype', '-t',
                         help='Type of the VM',
                         choices=['pc-q35', 'pc-i440fx'])
-    parser.add_argument('--pool', '-p',
+    parser_create.add_argument('--pool', '-p',
                         help='Thin pool to use to create the VM disk')
-    parser.add_argument('--volumegroup', '-vg',
+    parser_create.add_argument('--volumegroup', '-vg',
                         help='Thin pool Volume Group')
-    parser.add_argument('--size', '-s',
+    parser_create.add_argument('--size', '-s',
                         help='Size of the thin LV', default='10GB')
+    parser_edit = subparsers.add_parser('edit', help='Edit VM')
 
     args = parser.parse_args()
     if args.user is None or args.host is None:
