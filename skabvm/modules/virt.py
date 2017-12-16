@@ -94,7 +94,7 @@ class libVirt(object):
         vm = conn.defineXML(xml)
         return vm
 
-    def attach_disk_vm(self, vm, conn, template, typ, device):
+    def attach_disk_vm(self, vm, conn, template, typ, device, raw=False):
         """Attach to the vm a new disk based on a XML template.
 
         Attributes:
@@ -114,9 +114,12 @@ class libVirt(object):
         if typ == 'ide':
             tree.find('./target').attrib['dev'] = 'hda'
         tree.find('./source').attrib['file'] = device
+        tree.find('./driver').attrib['type'] = 'raw' if raw else 'qcow2'
         xml = ElementTree.tostring(root, encoding='utf8', method='xml')
-        vm = conn.define
-            
+        # Here we need to first make sure the vm is active
+        # We then attach the device with vm.attachDevice(xml)
+        # The problem is that we need to have a network connection
+        # before starting the vm
         pass
 
 # vim: set et ts=4 sw=4 :
