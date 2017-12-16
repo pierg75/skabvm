@@ -122,4 +122,9 @@ class libVirt(object):
         # before starting the vm
         pass
 
+    """
+    def attach_net_vm(self, conn):
+        all_networks = conn.listAllNetworks()
+        default = network if network.name() == 'default' for network in all_networks:
+    """
 # vim: set et ts=4 sw=4 :
