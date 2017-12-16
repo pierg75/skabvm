@@ -14,6 +14,16 @@ def check_options(args):
         print("to the hypervisor\n")
         parser.print_help()
         sys.exit(1)
+
+    if args.blocktype == "thinlv":
+        if args.filedevice:
+            print("Cannot mix file based options with block based ones")
+            sys.exit(2)
+    else:
+        if args.lvpool or args.volumegroup:
+            print("Cannot mix file based options with block based ones")
+            sys.exit(2)
+            
     return args
 
 
