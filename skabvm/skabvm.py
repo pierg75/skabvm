@@ -5,7 +5,26 @@ import sys
 
 import definitions
 
-from modules import virt
+from modules import dm, virt
+
+def check_options(args):
+    """Checks the various options to avoid incompatible combinations"""
+    if args.user is None or args.host is None:
+        print("You need to pass both the user and the host used to connect")
+        print("to the hypervisor\n")
+        parser.print_help()
+        sys.exit(1)
+
+    if args.blocktype == "thinlv":
+        if args.filedevice:
+            print("Cannot mix file based options with block based ones")
+            sys.exit(2)
+    else:
+        if args.lvpool or args.volumegroup:
+            print("Cannot mix file based options with block based ones")
+            sys.exit(2)
+            
+    return args
 
 
 def parse_options():
@@ -15,27 +34,31 @@ def parse_options():
 
     parser = argparse.ArgumentParser(
                 description='Provision a new Virtual Machine')
+    subparsers = parser.add_subparsers(help='sub-command help')
     parser.add_argument('name', help='The name of the new virtual machine')
     parser.add_argument('--user', help='Username for the connection')
     parser.add_argument('--host', help='Hostname')
-    parser.add_argument('--blockdevice', '-b',
-                        help='The block device used as storage')
-    parser.add_argument('--filedevice', '-f',
+    # Create submenu 
+    parser_create = subparsers.add_parser('create', help='Create a new VM')
+    parser_create.add_argument('--vmtype', help='Type of VM',
+                        choices=['pc-q35', 'pc-i440fx'],
+                        required=True)
+    parser_create_group_block = parser_create.add_argument_group('Disk devices options')
+    parser_create_group_block.add_argument('--blocktype', help='Type of disks presented to the Guest',
+						required=True, choices=['thinlv', 'file'])
+    parser_create_group_block.add_argument('--filedevice', 
                         help='The image file used as storage')
-    parser.add_argument('--networks', '-n',
-                        help='The number of networking devices')
-    parser.add_argument('--vmtype', '-t',
-                        help='Type of the VM',
-                        choices=['pc-q35', 'pc-i440fx'])
+    parser_create_group_block.add_argument('--lvpool', help='Thin pool LV to use to create the VM disk')
+    parser_create_group_block.add_argument('--volumegroup', '-vg',
+                        help='Thin pool Volume Group')
+    parser_create_group_block.add_argument('--size', help='Size of the thin LV', default='10GB')
+    parser_create_group_network = parser_create.add_argument_group('Network devices options')
+    parser_create_group_network.add_argument('--networks', help='The number of networking devices')
+    # Edit submenu
+    parser_edit = subparsers.add_parser('edit', help='Edit VM')
 
-    args = parser.parse_args()
-    if args.user is None or args.host is None:
-        print("You need to pass both the user and the host used to connect")
-        print("to the hypervisor\n")
-        parser.print_help()
-        sys.exit(1)
-    return args
-
+    return check_options(parser.parse_args())
+    
 
 def main():
     """The main function of skabvm"""
@@ -68,6 +91,16 @@ def main():
         conn.close()
         sys.exit(2)
 
+    # Let's instantiate a device mapper object
+    devm = dm.dmDev()
+    # Create a thinlv
+    errno, out, err = devm.create_thinlv(args.name, args.size,
+                                         args.pool, args.volumegroup)
+    if errno:
+        print("An error occurred while creating the ThinLV:")
+        print("\tStandard output: %" % out)
+        print("\tStandard error: %" % out)
+
     # Create the vm based on the template
     newvm = virtual.create_vm(args.name,
                               conn,
@@ -75,6 +108,7 @@ def main():
                               ("{}.{}".format(args.vmtype, "xml"))))
 
     print(newvm)
+
     conn.close()
     sys.exit(0)
 
