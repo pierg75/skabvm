@@ -7,6 +7,15 @@ import definitions
 
 from modules import dm, virt
 
+def check_options(args):
+    """Checks the various options to avoid incompatible combinations"""
+    if args.user is None or args.host is None:
+        print("You need to pass both the user and the host used to connect")
+        print("to the hypervisor\n")
+        parser.print_help()
+        sys.exit(1)
+    return args
+
 
 def parse_options():
     """Handles the various options passed to the command line.
@@ -38,14 +47,8 @@ def parse_options():
     # Edit submenu
     parser_edit = subparsers.add_parser('edit', help='Edit VM')
 
-    args = parser.parse_args()
-    if args.user is None or args.host is None:
-        print("You need to pass both the user and the host used to connect")
-        print("to the hypervisor\n")
-        parser.print_help()
-        sys.exit(1)
-    return args
-
+    return check_options(parser.parse_args())
+    
 
 def main():
     """The main function of skabvm"""
