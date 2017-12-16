@@ -19,23 +19,26 @@ def parse_options():
     parser.add_argument('name', help='The name of the new virtual machine')
     parser.add_argument('--user', help='Username for the connection')
     parser.add_argument('--host', help='Hostname')
+    # Create submenu 
     parser_create = subparsers.add_parser('create', help='Create a new VM')
-    parser_create_group_block = parser_create.add_mutually_exclusive_group()
-    parser_create_group_block.add_argument('--blockdevice', '-b',
+    parser_create.add_argument('--vmtype', help='Type of VM',
+                        choices=['pc-q35', 'pc-i440fx'],
+                        required=True)
+    parser_create_group_block = parser_create.add_argument_group('Disk devices options')
+    parser_create_group_block.add_argument('--blocktype', help='Type of disks presented to the Guest',
+						required=True, choices=['thinlv', 'file'])
+    parser_create_group_block_type_block = parser_create_group_block.add_mutually_exclusive_group()
+    parser_create_group_block_type_block.add_argument('--blockdevice', 
                         help='The block device used as storage')
-    parser_create_group_block.add_argument('--filedevice', '-f',
+    parser_create_group_block_type_block.add_argument('--filedevice', 
                         help='The image file used as storage')
-    parser_create.add_argument('--networks', '-n',
-                        help='The number of networking devices')
-    parser_create.add_argument('--vmtype', '-t',
-                        help='Type of the VM',
-                        choices=['pc-q35', 'pc-i440fx'])
-    parser_create.add_argument('--pool', '-p',
-                        help='Thin pool to use to create the VM disk')
-    parser_create.add_argument('--volumegroup', '-vg',
+    parser_create_group_block_type_block.add_argument('--pool', help='Thin pool to use to create the VM disk')
+    parser_create_group_block_type_block.add_argument('--volumegroup', '-vg',
                         help='Thin pool Volume Group')
-    parser_create.add_argument('--size', '-s',
-                        help='Size of the thin LV', default='10GB')
+    parser_create_group_block_type_block.add_argument('--size', help='Size of the thin LV', default='10GB')
+    parser_create_group_network = parser_create.add_argument_group('Network devices options')
+    parser_create_group_network.add_argument('--networks', help='The number of networking devices')
+    # Edit submenu
     parser_edit = subparsers.add_parser('edit', help='Edit VM')
 
     args = parser.parse_args()
