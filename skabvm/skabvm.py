@@ -107,7 +107,7 @@ def main():
                               os.path.join(definitions.TEMPLATE_PATH,
                               ("{}.{}".format(args.vmtype, "xml"))))
 
-    print(newvm)
+
 
     conn.close()
     sys.exit(0)
