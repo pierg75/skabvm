@@ -27,15 +27,12 @@ def parse_options():
     parser_create_group_block = parser_create.add_argument_group('Disk devices options')
     parser_create_group_block.add_argument('--blocktype', help='Type of disks presented to the Guest',
 						required=True, choices=['thinlv', 'file'])
-    parser_create_group_block_type_block = parser_create_group_block.add_mutually_exclusive_group()
-    parser_create_group_block_type_block.add_argument('--blockdevice', 
-                        help='The block device used as storage')
-    parser_create_group_block_type_block.add_argument('--filedevice', 
+    parser_create_group_block.add_argument('--filedevice', 
                         help='The image file used as storage')
-    parser_create_group_block_type_block.add_argument('--pool', help='Thin pool to use to create the VM disk')
-    parser_create_group_block_type_block.add_argument('--volumegroup', '-vg',
+    parser_create_group_block.add_argument('--lvpool', help='Thin pool LV to use to create the VM disk')
+    parser_create_group_block.add_argument('--volumegroup', '-vg',
                         help='Thin pool Volume Group')
-    parser_create_group_block_type_block.add_argument('--size', help='Size of the thin LV', default='10GB')
+    parser_create_group_block.add_argument('--size', help='Size of the thin LV', default='10GB')
     parser_create_group_network = parser_create.add_argument_group('Network devices options')
     parser_create_group_network.add_argument('--networks', help='The number of networking devices')
     # Edit submenu
