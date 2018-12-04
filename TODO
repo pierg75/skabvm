@@ -1,0 +1,27 @@
+Steps to create a VM:
+
+- Connect to the hypervisor
+- Check that the name is not already used
+- Create the THINLV device
+- Create the VM based on a template
+- If the 'default' network is not set, attach one (based on a template)
+- Attach the eventual other networks
+- Attach the VM disks
+
+REAL TODO:
+
+- Finish the attach_net_vm() (to attach a network on the VM)
+ 
+
+
+
+NOTES:
+
+This should be a more or less complete list of the steps necessary to create a DM device using the devicemapper API:
+
+dm_task_create(DM_DEVICE_CREATE)
+dm_task_set_name()
+dm_task_add_target()
+dm_task_set_cookie()
+dm_task_run()
+dm_task_destroy()
